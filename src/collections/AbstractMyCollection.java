@@ -1,3 +1,4 @@
+package collections;
 public abstract class AbstractMyCollection {
     protected int size;
     protected AbstractMyCollection() {
