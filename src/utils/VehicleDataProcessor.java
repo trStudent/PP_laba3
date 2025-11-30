@@ -1,30 +1,30 @@
 package utils;
 
-
+import collections.MyList;
 import factory.AbstractVehicle;
 import factory.VehicleFactory;
 import factory.VehicleType;
-import utils.FileTextUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
+import java.util.Date;
 
 public class VehicleDataProcessor {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     public VehicleDataProcessor() {
         dateFormat.setLenient(false);
     }
 
-    public List<AbstractVehicle> readVehicles(String inputFile, String logFile) throws IOException {
-        List<String> lines = FileTextUtils.readLines(inputFile);
-        List<AbstractVehicle> vehicles = new ArrayList<>();
-        List<String> log = new ArrayList<>();
+    public MyList<AbstractVehicle> readVehicles(String inputFile, String logFile) throws IOException {
+        MyList<String> lines = FileTextUtils.readLines(inputFile);
+        MyList<AbstractVehicle> vehicles = new MyList<>();
+        MyList<String> log = new MyList<>();
 
         int lineNo = 0;
-        for (String rawLine : lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            String rawLine = lines.get(i);
             lineNo++;
             String line = rawLine.trim();
             if (line.isEmpty()) continue;
@@ -72,6 +72,7 @@ public class VehicleDataProcessor {
                 log.add(formatLog(lineNo, "Empty date → set to null"));
             }
 
+            // 7) PRICE
             double price = parseDouble(parts[6], 0.0, lineNo, "price", log);
 
             AbstractVehicle v;
@@ -102,7 +103,7 @@ public class VehicleDataProcessor {
         return "Line " + lineNo + ": " + msg;
     }
 
-    private long parseLong(String raw, long defaultValue, int lineNo, String field, List<String> log) {
+    private long parseLong(String raw, long defaultValue, int lineNo, String field, MyList<String> log) {
         String cleaned = raw.trim().replaceAll("[^0-9\\-]", "");
         if (cleaned.isEmpty() || cleaned.equals("-")) {
             log.add(formatLog(lineNo, "Invalid " + field + " '" + raw + "' → set to " + defaultValue));
@@ -116,7 +117,7 @@ public class VehicleDataProcessor {
         }
     }
 
-    private double parseDouble(String raw, double defaultValue, int lineNo, String field, List<String> log) {
+    private double parseDouble(String raw, double defaultValue, int lineNo, String field, MyList<String> log) {
         String cleaned = raw.trim().replaceAll("[^0-9\\.\\-]", "");
         if (cleaned.isEmpty() || cleaned.equals("-") || cleaned.equals(".")) {
             log.add(formatLog(lineNo, "Invalid " + field + " '" + raw + "' → set to " + defaultValue));

@@ -1,17 +1,34 @@
 package utils;
+
+import collections.MyList;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.List;
 
 public class FileTextUtils {
 
-    public static List<String> readLines(String path) throws IOException {
-        return Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
+    public static MyList<String> readLines(String path) throws IOException {
+        java.util.List<String> javaLines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
+        MyList<String> lines = new MyList<>(javaLines.size() > 0 ? javaLines.size() : 10);
+        for (String line : javaLines) {
+            lines.add(line);
+        }
+        return lines;
     }
 
-    public static void writeLines(List<String> lines, String path) throws IOException {
-        Files.write(Paths.get(path), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    public static void writeLines(MyList<String> lines, String path) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < lines.size(); i++) {
+            sb.append(lines.get(i));
+            if (i < lines.size() - 1) {
+                sb.append(System.lineSeparator());
+            }
+        }
+        Files.write(Paths.get(path),
+                sb.toString().getBytes(StandardCharsets.UTF_8),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     public static String readAll(String path) throws IOException {
@@ -21,8 +38,8 @@ public class FileTextUtils {
 
     public static void writeAll(String content, String path) throws IOException {
         Files.write(Paths.get(path),
-                    content.getBytes(StandardCharsets.UTF_8),
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
+                content.getBytes(StandardCharsets.UTF_8),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
     }
 }
