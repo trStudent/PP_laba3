@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyList<E> extends AbstractMyCollection {
     private static final int DEFAULT_CAPACITY = 10;
     private Object[] elements;
+    private int modCount = 0;
 
     public MyList() {
         this(DEFAULT_CAPACITY);
@@ -31,6 +32,7 @@ public class MyList<E> extends AbstractMyCollection {
         ensureCapacity(size + 1);
         elements[size] = e;
         increaseSize();
+        modCount++;
     }
 
     public void add(int index, E e) {
@@ -40,6 +42,7 @@ public class MyList<E> extends AbstractMyCollection {
         System.arraycopy(elements, index, elements, index + 1, size - index);
         elements[index] = e;
         increaseSize();
+        modCount++;
     }
 
     @SuppressWarnings("unchecked")
@@ -65,6 +68,7 @@ public class MyList<E> extends AbstractMyCollection {
             System.arraycopy(elements, index + 1, elements, index, moved);
         }
         elements[--size] = null;
+        modCount++;
         return old;
     }
 
@@ -74,6 +78,7 @@ public class MyList<E> extends AbstractMyCollection {
             elements[i] = null;
         }
         size = 0;
+        modCount++;
     }
 
     public boolean contains(E e) {
@@ -120,6 +125,51 @@ public class MyList<E> extends AbstractMyCollection {
         }
         sb.append(']');
         return sb.toString();
+    }
+    
+    public java.util.Iterator<E> iterator() {
+        return new Itr();
+    }
+
+    private class Itr implements java.util.Iterator<E> {
+        private int cursor = 0;       // index of next element to return
+        private int lastRet = -1;     // index of last element returned; -1 if none
+        private int expectedModCount = modCount;
+
+        @Override
+        public boolean hasNext() {
+            return cursor < size;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public E next() {
+            checkForComodification();
+            if (cursor >= size) {
+                throw new java.util.NoSuchElementException();
+            }
+            lastRet = cursor;
+            E e = (E) elements[cursor];
+            cursor++;
+            return e;
+        }
+
+        @Override
+        public void remove() {
+            checkForComodification();
+            if (lastRet < 0) {
+                throw new IllegalStateException();
+            }
+            MyList.this.remove(lastRet);
+            cursor = lastRet;
+            lastRet = -1;
+            expectedModCount = modCount;
+        }
+
+        final void checkForComodification() {
+            if (modCount != expectedModCount)
+                throw new java.util.ConcurrentModificationException();
+        }
     }
 }
 

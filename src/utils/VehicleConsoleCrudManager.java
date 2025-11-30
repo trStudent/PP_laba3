@@ -59,7 +59,7 @@ public class VehicleConsoleCrudManager {
     }
 
     private void showMenu() {
-        System.out.println("\n=== VEHICLE CUD MENU ===");
+        System.out.println("\n=== VEHICLE MENU ===");
         System.out.println("1) Добавить транспорт");
         System.out.println("2) Обновить транспорт");
         System.out.println("3) Удалить транспорт");
@@ -68,7 +68,7 @@ public class VehicleConsoleCrudManager {
         System.out.print("Ваш выбор: ");
     }
 
-    private void addVehicle() {
+    public void addVehicle() {
         AbstractVehicle vehicle = promptVehicle(null);
         vehicles.add(vehicle);
         vehicleIndex.put(vehicle.getId(), vehicle);
@@ -76,7 +76,7 @@ public class VehicleConsoleCrudManager {
         System.out.println("Транспорт добавлен.");
     }
 
-    private void updateVehicle() {
+    public void updateVehicle() {
         long id = promptLong("ID для обновления: ");
         if (!vehicleIndex.containsKey(id)) {
             System.out.println("Транспорт с таким ID не найден.");
@@ -87,14 +87,13 @@ public class VehicleConsoleCrudManager {
         System.out.println("Транспорт обновлён.");
     }
 
-    private void deleteVehicle() {
+    public void deleteVehicle() {
         long id = promptLong("ID для удаления: ");
         if (!vehicleIndex.containsKey(id)) {
             System.out.println("Транспорт с таким ID не найден.");
             return;
         }
         AbstractVehicle target = vehicleIndex.get(id);
-        // убрать из списка
         for (int i = 0; i < vehicles.size(); i++) {
             if (vehicles.get(i).getId() == id) {
                 vehicles.remove(i);
@@ -106,7 +105,7 @@ public class VehicleConsoleCrudManager {
         System.out.println("Транспорт удалён.");
     }
 
-    private void listVehicles() {
+    public void listVehicles() {
         System.out.println("\n--- Содержимое MyList (iterator) ---");
         var listIterator = vehicles.iterator();
         while (listIterator.hasNext()) {
@@ -164,10 +163,9 @@ public class VehicleConsoleCrudManager {
         }
     }
 
-    private void persist() {
+    public void persist() {
         try {
             FileTextUtils.writeLines(serializeVehicles(), dataFile);
-            // при необходимости можно заново прогнать парсер, чтобы обновить лог
             dataProcessor.readVehicles(dataFile, logFile);
         } catch (IOException e) {
             System.err.println("Ошибка записи файла: " + e.getMessage());
